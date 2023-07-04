@@ -2,21 +2,22 @@
 
 import React, { FormEvent, useState } from "react";
 import Banner, { BannerData } from "../banner/Banner";
+import { sendContactEmail } from "@/service/contact";
 
 type Form = {
-  email: string;
+  from: string;
   subject: string;
   message: string;
 };
 
 const LABEL_CLASS = "font-semibold text-white";
-
+const DEFAULT_FORM_DATA = {
+  from: "",
+  subject: "",
+  message: "",
+};
 export default function ContactForm() {
-  const [form, setForm] = useState<Form>({
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [form, setForm] = useState<Form>(DEFAULT_FORM_DATA);
   const [banner, setBanner] = useState<BannerData | null>(null);
 
   const onChange = (
@@ -28,11 +29,25 @@ export default function ContactForm() {
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setBanner({ message: "성공", state: "success" });
-    console.log(form);
-    setTimeout(() => {
-      setBanner(null);
-    }, 3000);
+    sendContactEmail(form)
+      .then(() => {
+        setBanner({
+          message: "메일을 성공적으로 보냈습니다.",
+          state: "success",
+        });
+        setForm(DEFAULT_FORM_DATA);
+      })
+      .catch(() => {
+        setBanner({
+          message: "메일전송에 실패했습니다. 다시 시도해 주세요",
+          state: "error",
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setBanner(null);
+        }, 3000);
+      });
   };
 
   return (
@@ -42,16 +57,16 @@ export default function ContactForm() {
         onSubmit={onSubmit}
         className="flex flex-col w-full gap-2 p-4 mt-4 text-black bg-slate-700 rounded-xl"
       >
-        <label htmlFor="email" className={LABEL_CLASS}>
+        <label htmlFor="from" className={LABEL_CLASS}>
           Your Email
         </label>
         <input
           type="email"
-          id="email"
-          name="email"
+          id="from"
+          name="from"
           required
           autoFocus
-          value={form.email}
+          value={form.from}
           onChange={onChange}
         />
         <label htmlFor="subject" className={LABEL_CLASS}>
