@@ -9,5 +9,8 @@ yup
 
 ### 환경변수
 
+env.local
 AUTH_USER: 구글 이메일 계정
 AUTH_PASS: 구글 이메일 app password
+
+- Google 계정 ➡️ 2단계 인증 ➡️ 앱 비밀번호 ➡️ Blog
